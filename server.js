@@ -2,67 +2,44 @@ const net = require('net');
 const fs = require('fs');
 const readline = require('readline');
 
-
-class server{
-    constructor(){
-    }
-    /*setNameUser(name){
-        this.name = name;
-    }
-    getNameDirective(){
-        return this.name;
-    }*/
-    trouveUnNom(){
-        let i = 0;
-        let name = "a";
-        const server = net.createServer((socket) => {
+function server(){
+    let userName = false;
+    const server = net.createServer((socket) => {
         console.log('new connection')
         
         socket.on('data', (data) => {
             const [directive, parameter] = data.toString().split(' ')
+            const regex = new RegExp(`${parameter}`);
             const input = fs.createReadStream("./connection.json");
             const rl = readline.createInterface({ input });
-            const regex = new RegExp(`${parameter}`);
             
-            // switch(directive) {
-            //     case 'USER':
-            //         // check if user exist in database
-            //         // if true
-            //         rl.on('line', (line) => {
-            //             if (line.match(regex) != null){
-            //                 this.setNameUser(line.match(regex));
-            //                 console.log(i);
-            //             }
-            //             i++;
-            //         });
-            //         this.setNameUser(name)
-            //         socket.write('200 successfuly connected')
-            //         break;
-            //     }
-            if (directive == "USER"){
-                //essayer le export
-                rl.on('line', (line) => {
+            switch(directive) {
+                case 'USER':
+                    // check if user exist in database
+                    // if true
+                    rl.on('line', (line) => {
                         if (line.match(regex) != null){
-                            name = line.match(regex);
-                            //console.log(name);
+                            userName = true;
+                            console.log(line.match(regex));            
                         }
-                        
-                        i++;
-                }); 
-                const listener = rl.rawListeners('line');
-                console.log(listener[0]);
-            }
-                //set
-        })
-            
+                    });
+                    break;
+                }
+                rl.on('close', function () {
+                    console.log(userName)
+                if (userName === true){
+                    socket.write('User exist in the database');
+                }
+            });
             socket.write('Hello from server')
-    })
-        
-        server.listen(5000, () => {
-          console.log('Server started at port 5000')
         })
-    }
+    })
+    
+    server.listen(5000, () => {
+        console.log('Server started at port 5000')
+    })
+
+    //console.log(gobal.name);
 }
 
-let server1 = new server();
-server1.trouveUnNom();
+server();

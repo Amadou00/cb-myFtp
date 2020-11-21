@@ -1,4 +1,4 @@
-
+const readline = require('readline');
 const net = require('net')
 
 const client = new net.Socket()
@@ -16,19 +16,28 @@ class User{
         return this.password;
     }
     setUserName(){
-        client.write(`USER ${this.userName} \n\r`);
+        client.write(`${this.userName} \n\r`);
     }
     //A ne jamais faire dans une bd
     setUserPassword(){
         client.write(`${this.password} \n\r`);
     }
     
-    connectServer(){
-        client.connect(5000, '127.0.0.1', () => {
-          console.log('connected');
-          this.setUserName();
+    connectServer(port, host){
+        const rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout
+          });
+        client.connect(port, host, () => {
+            console.log('connected');
+            //client.emit("line");
+            rl.question(`Hello ${this.userName}, write your commands\n` , (answer) => {
+                client.write(`${answer} ${this.userName} \n\r`);
+                rl.close();
+            });
+            
         })
-        
+    
         client.on('data', (data) => {
           console.log(data.toString())
         })
@@ -36,4 +45,6 @@ class User{
 }
 
 let user1 = new User("Amadou", "azerty");
-user1.connectServer();
+user1.connectServer(5000, '127.0.0.1');
+
+//nom et mdp ne peut être vérifier qu'une seule fois, récuperer la commande avec le lancement du fichier
