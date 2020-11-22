@@ -28,18 +28,28 @@ class User{
             input: process.stdin,
             output: process.stdout
           });
+        let test = false; 
+        let rep = false;
         client.connect(port, host, () => {
             console.log('connected');
             //client.emit("line");
-            rl.question(`Hello ${this.userName}, write your commands\n` , (answer) => {
-                client.write(`${answer} ${this.userName} \n\r`);
-                rl.close();
-            });
+            rl.on('line', (request) =>[
+                client.write(`${request} ${this.userName} \n\r`)
+            ])
+
+                // rl.question(`Hello ${this.userName}, write your commands\n` , (answer) => {
+                //     client.write(`${answer} ${this.userName} \n\r`);
+                //     test = true;
+                //     rl.close();
+                // });
             
         })
     
         client.on('data', (data) => {
-          console.log(data.toString())
+            if (data == "User exist in the database"){
+                rep = true;
+            }
+          console.log(data.toString());
         })
     }
 }

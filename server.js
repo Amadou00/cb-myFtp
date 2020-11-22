@@ -18,20 +18,14 @@ function server(){
                     // check if user exist in database
                     // if true
                     rl.on('line', (line) => {
+                        console.log(`line => ${line}`);            
                         if (line.match(regex) != null){
                             userName = true;
-                            console.log(line.match(regex));            
+                            socket.write('User exist in the database');
                         }
                     });
                     break;
                 }
-                rl.on('close', function () {
-                    console.log(userName)
-                if (userName === true){
-                    socket.write('User exist in the database');
-                }
-            });
-            socket.write('Hello from server')
         })
     })
     
